@@ -1,3 +1,148 @@
+# app_name = "grand_renovations_app"
+# app_title = "Grand Renovations App"
+# app_publisher = "Darshana Patil"
+# app_description = "Complete CRM, Survey, Quotation & Job Management for Renovation Business"
+# app_email = "darshanap01@brainmine.ai"
+# app_license = "mit"
+
+# # ------------------------------------------
+# # CONNECT Opportunity → Survey
+# # ------------------------------------------
+
+# override_doctype_dashboards = {
+#     "Opportunity": "grand_renovations_app.overrides.opportunity.get_dashboard_data"
+# }
+
+# doc_events = {
+#     "Opportunity": {
+#         "onload": "grand_renovations_app.overrides.opportunity.onload"
+#     }
+# }
+
+# doctype_js = {
+#     "Opportunity": "public/js/opportunity.js"
+# }
+
+# override_doctype_dashboards = {
+#     "Survey": "grand_renovations_app.overrides.survey.get_dashboard_data"
+# }
+
+
+
+# File: grand_renovations_app/grand_renovations_app/hooks.py
+# Complete configuration for Opportunity → Survey → Quotation flow
+
+# app_name = "grand_renovations_app"
+# app_title = "Grand Renovations App"
+# app_publisher = "Darshana Patil"
+# app_description = "Complete CRM, Survey, Quotation & Job Management for Renovation Business"
+# app_email = "darshanap01@brainmine.ai"
+# app_license = "mit"
+
+# app_include_js = [
+#     "/assets/grand_renovations_app/js/google_places.js",
+#     # "/assets/grand_renovations_app/js/lead_list.js"
+
+# ]
+
+
+# app_include_css = [
+#     "/assets/grand_renovations_app/css/hide_status.css",
+    
+# ]
+# # ---------------------------------------------------------
+# # CONNECT Opportunity → Survey AND Survey → Quotation
+# # ---------------------------------------------------------
+
+# # Override dashboard data for Connections tab
+# # override_doctype_dashboards = {
+# #     "Opportunity": "grand_renovations_app.overrides.opportunity.get_dashboard_data",
+# #     "Survey": "grand_renovations_app.overrides.survey.get_dashboard_data",
+# # }
+
+# # Override dashboard data for Connections tab
+# override_doctype_dashboards = {
+#     "Lead": "grand_renovations_app.overrides.lead.get_dashboard_data",
+#     "Opportunity": "grand_renovations_app.overrides.opportunity.get_dashboard_data",
+#     "Survey": "grand_renovations_app.overrides.survey.get_dashboard_data",
+# }
+# # ---------------------------------------------------------
+# # DOCUMENT EVENTS - Complete Workflow Automation
+# # ---------------------------------------------------------
+# doc_events = {
+#     # LEAD EVENTS
+#     "Lead": {
+#         "after_insert": "grand_renovations_app.overrides.stage_automation.set_lead_initial_stage",
+
+#     },
+    
+#     # OPPORTUNITY EVENTS
+#     "Opportunity": {
+#         "onload": "grand_renovations_app.overrides.opportunity.onload",
+#         "after_insert": "grand_renovations_app.overrides.stage_automation.update_lead_stage_on_opportunity",
+#     },
+    
+#     # SURVEY EVENTS
+#     # "Survey": {
+#     #     "after_insert": [
+#     #         "grand_renovations_app.overrides.survey.create_calendar_event",
+#     #         "grand_renovations_app.overrides.stage_automation.update_opportunity_stage_on_survey",
+#     #     ]
+#     # },
+
+#     "Survey": {
+#     "after_insert": [
+#         "grand_renovations_app.overrides.survey.create_calendar_event",
+#         "grand_renovations_app.overrides.stage_automation.update_opportunity_stage_on_survey",
+#     ],
+#     "on_update": [
+#         "grand_renovations_app.overrides.survey.create_calendar_event"
+#     ]
+# },
+
+    
+#     # QUOTATION EVENTS
+#     "Quotation": {
+#         "on_submit": "grand_renovations_app.overrides.stage_automation.update_survey_stage_on_quotation",
+#     },
+    
+#     # SALES ORDER EVENTS
+#     "Sales Order": {
+#         "on_submit": "grand_renovations_app.overrides.stage_automation.update_stage_on_sales_order",
+#     },
+#    "File": {
+#         "before_insert": "grand_renovations_app.overrides.file.before_insert"
+#     },
+
+# #    "File": {
+# #         "after_insert": "grand_renovations_app.utils.attachment_sync.sync_attachments_across_chain"
+# #     }
+
+# }
+# # doctype_js = {
+# #     "Survey": "public/js/survey.js"
+# # }
+
+
+# # Include JavaScript files for custom forms
+# doctype_js = {
+#     "Opportunity": "public/js/opportunity.js",
+#     "Survey": "public/js/survey.js",
+#     "Quotation": "public/js/quotation.js",
+#     "Lead": "public/js/lead.js",
+    
+
+
+
+ 
+# }
+
+
+
+
+# File: grand_renovations_app/grand_renovations_app/hooks.py
+# Complete configuration for Lead → Survey → Quotation → Sales Order → Sales Invoice flow
+
 app_name = "grand_renovations_app"
 app_title = "Grand Renovations App"
 app_publisher = "Darshana Patil"
@@ -5,245 +150,84 @@ app_description = "Complete CRM, Survey, Quotation & Job Management for Renovati
 app_email = "darshanap01@brainmine.ai"
 app_license = "mit"
 
-# Apps
-# ------------------
+app_include_js = [
+    "/assets/grand_renovations_app/js/google_places.js",
+]
 
-# required_apps = []
+app_include_css = [
+    "/assets/grand_renovations_app/css/hide_status.css",
+]
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "grand_renovations_app",
-# 		"logo": "/assets/grand_renovations_app/logo.png",
-# 		"title": "Grand Renovations App",
-# 		"route": "/grand_renovations_app",
-# 		"has_permission": "grand_renovations_app.api.permission.has_app_permission"
-# 	}
-# ]
+list_view_settings = {
+    "Lead": "grand_renovations_app.overrides.lead_list"
+}
 
-# Includes in <head>
-# ------------------
 
-# include js, css files in header of desk.html
-# app_include_css = "/assets/grand_renovations_app/css/grand_renovations_app.css"
-# app_include_js = "/assets/grand_renovations_app/js/grand_renovations_app.js"
 
-# include js, css files in header of web template
-# web_include_css = "/assets/grand_renovations_app/css/grand_renovations_app.css"
-# web_include_js = "/assets/grand_renovations_app/js/grand_renovations_app.js"
+fixtures = [
+    "Custom Field",
+    "Property Setter",
+    "Client Script",
+    "Workflow",
+    "Print Format"
+]
 
-# include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "grand_renovations_app/public/scss/website"
 
-# include js, css files in header of web form
-# webform_include_js = {"doctype": "public/js/doctype.js"}
-# webform_include_css = {"doctype": "public/css/doctype.css"}
 
-# include js in page
-# page_js = {"page" : "public/js/file.js"}
+# ---------------------------------------------------------
+# CONNECT Lead → Survey AND Survey → Quotation
+# Override dashboard data for Connections tab
+# ---------------------------------------------------------
+override_doctype_dashboards = {
+    "Lead": "grand_renovations_app.overrides.lead.get_dashboard_data",
+    "Survey": "grand_renovations_app.overrides.survey.get_dashboard_data",
+}
 
-# include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
-# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+# ---------------------------------------------------------
+# DOCUMENT EVENTS - Complete Workflow Automation
+# Stage Flow: Lead → Survey → Quotation → Sales Order → Sales Invoice
+# ---------------------------------------------------------
+doc_events = {
+    # LEAD EVENTS
+    "Lead": {
+        "after_insert": "grand_renovations_app.overrides.stage_automation.set_lead_initial_stage",
+    },
+    
+    # SURVEY EVENTS
+    "Survey": {
+        "after_insert": [
+            "grand_renovations_app.overrides.survey.create_calendar_event",
+            "grand_renovations_app.overrides.stage_automation.update_lead_stage_on_survey",
+        ],
+        "on_update": [
+            "grand_renovations_app.overrides.survey.create_calendar_event"
+        ]
+    },
+    
+    # QUOTATION EVENTS
+    "Quotation": {
+        "on_submit": "grand_renovations_app.overrides.stage_automation.update_stage_on_quotation",
+    },
+    
+    # SALES ORDER EVENTS
+    "Sales Order": {
+        "on_submit": "grand_renovations_app.overrides.stage_automation.update_stage_on_sales_order",
+    },
+    
+    # SALES INVOICE EVENTS
+    "Sales Invoice": {
+        "on_submit": "grand_renovations_app.overrides.stage_automation.update_stage_on_sales_invoice",
+    },
+    
+    # FILE EVENTS
+    "File": {
+        "before_insert": "grand_renovations_app.overrides.file.before_insert"
+    },
+}
 
-# Svg Icons
-# ------------------
-# include app icons in desk
-# app_include_icons = "grand_renovations_app/public/icons.svg"
-
-# Home Pages
-# ----------
-
-# application home page (will override Website Settings)
-# home_page = "login"
-
-# website user home page (by Role)
-# role_home_page = {
-# 	"Role": "home_page"
-# }
-
-# Generators
-# ----------
-
-# automatically create page for each record of this doctype
-# website_generators = ["Web Page"]
-
-# Jinja
-# ----------
-
-# add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "grand_renovations_app.utils.jinja_methods",
-# 	"filters": "grand_renovations_app.utils.jinja_filters"
-# }
-
-# Installation
-# ------------
-
-# before_install = "grand_renovations_app.install.before_install"
-# after_install = "grand_renovations_app.install.after_install"
-
-# Uninstallation
-# ------------
-
-# before_uninstall = "grand_renovations_app.uninstall.before_uninstall"
-# after_uninstall = "grand_renovations_app.uninstall.after_uninstall"
-
-# Integration Setup
-# ------------------
-# To set up dependencies/integrations with other apps
-# Name of the app being installed is passed as an argument
-
-# before_app_install = "grand_renovations_app.utils.before_app_install"
-# after_app_install = "grand_renovations_app.utils.after_app_install"
-
-# Integration Cleanup
-# -------------------
-# To clean up dependencies/integrations with other apps
-# Name of the app being uninstalled is passed as an argument
-
-# before_app_uninstall = "grand_renovations_app.utils.before_app_uninstall"
-# after_app_uninstall = "grand_renovations_app.utils.after_app_uninstall"
-
-# Desk Notifications
-# ------------------
-# See frappe.core.notifications.get_notification_config
-
-# notification_config = "grand_renovations_app.notifications.get_notification_config"
-
-# Permissions
-# -----------
-# Permissions evaluated in scripted ways
-
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
-
-# DocType Class
-# ---------------
-# Override standard doctype classes
-
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
-
-# Document Events
-# ---------------
-# Hook on document methods and events
-
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
-
-# Scheduled Tasks
-# ---------------
-
-# scheduler_events = {
-# 	"all": [
-# 		"grand_renovations_app.tasks.all"
-# 	],
-# 	"daily": [
-# 		"grand_renovations_app.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"grand_renovations_app.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"grand_renovations_app.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"grand_renovations_app.tasks.monthly"
-# 	],
-# }
-
-# Testing
-# -------
-
-# before_tests = "grand_renovations_app.install.before_tests"
-
-# Overriding Methods
-# ------------------------------
-#
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "grand_renovations_app.event.get_events"
-# }
-#
-# each overriding function accepts a `data` argument;
-# generated from the base implementation of the doctype dashboard,
-# along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "grand_renovations_app.task.get_dashboard_data"
-# }
-
-# exempt linked doctypes from being automatically cancelled
-#
-# auto_cancel_exempted_doctypes = ["Auto Repeat"]
-
-# Ignore links to specified DocTypes when deleting documents
-# -----------------------------------------------------------
-
-# ignore_links_on_delete = ["Communication", "ToDo"]
-
-# Request Events
-# ----------------
-# before_request = ["grand_renovations_app.utils.before_request"]
-# after_request = ["grand_renovations_app.utils.after_request"]
-
-# Job Events
-# ----------
-# before_job = ["grand_renovations_app.utils.before_job"]
-# after_job = ["grand_renovations_app.utils.after_job"]
-
-# User Data Protection
-# --------------------
-
-# user_data_fields = [
-# 	{
-# 		"doctype": "{doctype_1}",
-# 		"filter_by": "{filter_by}",
-# 		"redact_fields": ["{field_1}", "{field_2}"],
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_2}",
-# 		"filter_by": "{filter_by}",
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_3}",
-# 		"strict": False,
-# 	},
-# 	{
-# 		"doctype": "{doctype_4}"
-# 	}
-# ]
-
-# Authentication and authorization
-# --------------------------------
-
-# auth_hooks = [
-# 	"grand_renovations_app.auth.validate"
-# ]
-
-# Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
-
-# default_log_clearing_doctypes = {
-# 	"Logging DocType Name": 30  # days to retain logs
-# }
-
-# Translation
-# ------------
-# List of apps whose translatable strings should be excluded from this app's translations.
-# ignore_translatable_strings_from = []
-
+# Include JavaScript files for custom forms
+doctype_js = {
+    "Lead": "public/js/lead.js",
+    "Survey": "public/js/survey.js",
+    "Quotation": "public/js/quotation.js",
+}
