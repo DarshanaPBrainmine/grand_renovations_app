@@ -557,133 +557,480 @@ def create_customer_from_lead(lead_name):
 
 
 
+# import frappe
+# from frappe.desk.form.assign_to import add as add_assignment
+
+
+# def create_calendar_event(doc, method=None):
+
+#     # -------------------------------------------------
+#     # FIND EXISTING EVENT LINKED TO SURVEY
+#     # -------------------------------------------------
+#     event_name = frappe.db.get_value(
+#         "Event Link",
+#         {
+#             "link_doctype": "Survey",
+#             "link_name": doc.name
+#         },
+#         "parent"
+#     )
+
+#     # -------------------------------------------------
+#     # HARD REQUIREMENTS
+#     # -------------------------------------------------
+#     if not (doc.surveyor and doc.survey_start_date):
+#         if event_name:
+#             frappe.delete_doc(
+#                 "Event",
+#                 event_name,
+#                 ignore_permissions=True,
+#                 force=True
+#             )
+#         return
+
+#     # -------------------------------------------------
+#     # CREATE OR UPDATE EVENT
+#     # -------------------------------------------------
+#     if event_name:
+#         event = frappe.get_doc("Event", event_name)
+#         is_new = False
+#     else:
+#         event = frappe.new_doc("Event")
+#         event.event_type = "Private"
+#         is_new = True
+
+#     # -------------------------------------------------
+#     # SUBJECT
+#     # -------------------------------------------------
+#     subject_parts = []
+#     if doc.title:
+#         subject_parts.append(doc.title)
+#     if doc.project_type:
+#         subject_parts.append(doc.project_type)
+
+#     event.subject = "Survey Assigned: " + " – ".join(subject_parts or ["Survey"])
+
+#     # -------------------------------------------------
+#     # DATE LOGIC (NO HOURS)
+#     # -------------------------------------------------
+#     event.starts_on = doc.survey_start_date
+
+#     if doc.survey_end_date:
+#         # Timed / multi-day event
+#         event.ends_on = doc.survey_end_date
+#         event.all_day = 0
+#     else:
+#         # ALL-DAY event (single date)
+#         event.ends_on = doc.survey_start_date
+#         event.all_day = 1
+
+#     # -------------------------------------------------
+#     # DESCRIPTION (ONLY LEAD)
+#     # -------------------------------------------------
+#     event.description = f"""
+# Survey Title: {doc.title or '—'}
+# Project Type: {doc.project_type or '—'}
+# Lead: {doc.lead or '—'}
+# Notes: {doc.notes or '—'}
+# """.strip()
+
+#     # -------------------------------------------------
+#     # PARTICIPANT
+#     # -------------------------------------------------
+#     event.event_participants = []
+#     event.append("event_participants", {
+#         "reference_doctype": "User",
+#         "reference_docname": doc.surveyor
+#     })
+
+#     # -------------------------------------------------
+#     # LINK EVENT TO SURVEY
+#     # -------------------------------------------------
+#     event.links = []
+#     event.append("links", {
+#         "link_doctype": "Survey",
+#         "link_name": doc.name
+#     })
+
+#     # -------------------------------------------------
+#     # GOOGLE CALENDAR
+#     # -------------------------------------------------
+#     calendar = frappe.db.get_value(
+#         "Google Calendar",
+#         {
+#             "enable": 1,
+#             "push_to_google_calendar": 1,
+#             "name": "Grand renovation"
+#         },
+#         "name"
+#     )
+
+#     if calendar:
+#         event.google_calendar = calendar
+#         event.sync_with_google_calendar = 1
+#         event.flags.update({"update_google_calendar": True})
+
+#     # -------------------------------------------------
+#     # SAVE EVENT
+#     # -------------------------------------------------
+#     if is_new:
+#         event.insert(ignore_permissions=True)
+#     else:
+#         event.save(ignore_permissions=True)
+
+#     # -------------------------------------------------
+#     # ASSIGN SURVEYOR (ONLY ON CREATE)
+#     # -------------------------------------------------
+#     if is_new:
+#         add_assignment({
+#             "assign_to": [doc.surveyor],
+#             "doctype": "Event",
+#             "name": event.name
+#         })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # File: grand_renovations_app/grand_renovations_app/overrides/survey.py
+
 import frappe
 from frappe.desk.form.assign_to import add as add_assignment
 
 
+def get_dashboard_data(data):
+    """Add Quotation connection to Survey dashboard"""
+    data["transactions"].append({
+        "label": "Sales",
+        "items": ["Quotation"]
+    })
+    return data
+
+
 def create_calendar_event(doc, method=None):
-
-    # -------------------------------------------------
-    # FIND EXISTING EVENT LINKED TO SURVEY
-    # -------------------------------------------------
-    event_name = frappe.db.get_value(
-        "Event Link",
-        {
-            "link_doctype": "Survey",
-            "link_name": doc.name
-        },
-        "parent"
-    )
-
-    # -------------------------------------------------
-    # HARD REQUIREMENTS
-    # -------------------------------------------------
-    if not (doc.surveyor and doc.survey_start_date):
-        if event_name:
-            frappe.delete_doc(
-                "Event",
-                event_name,
-                ignore_permissions=True,
-                force=True
-            )
+    """
+    Create or update calendar event for Survey.
+    Syncs to Google Calendar - attendees will be updated via background job.
+    """
+    
+    # ---------------------------------
+    # EXECUTION LOCK (prevents double run)
+    # ---------------------------------
+    lock_key = f"survey_calendar_lock_{doc.name}"
+    if frappe.flags.get(lock_key):
         return
+    frappe.flags[lock_key] = True
 
-    # -------------------------------------------------
-    # CREATE OR UPDATE EVENT
-    # -------------------------------------------------
-    if event_name:
-        event = frappe.get_doc("Event", event_name)
-        is_new = False
-    else:
-        event = frappe.new_doc("Event")
-        event.event_type = "Private"
-        is_new = True
+    try:
+        # ---------------------------------
+        # Hard requirements
+        # ---------------------------------
+        if not doc.surveyor:
+            return
+        
+        if not doc.survey_start_date:
+            return
+        
+        # Skip if this is a new unsaved document
+        if doc.name.startswith("new-survey"):
+            return
+        
+        # Make sure the document is committed to database
+        if not frappe.db.exists("Survey", doc.name):
+            return
 
-    # -------------------------------------------------
-    # SUBJECT
-    # -------------------------------------------------
-    subject_parts = []
-    if doc.title:
-        subject_parts.append(doc.title)
-    if doc.project_type:
-        subject_parts.append(doc.project_type)
+        # ---------------------------------
+        # Get surveyor email
+        # ---------------------------------
+        surveyor_email = doc.surveyor
+        if "@" not in surveyor_email:
+            surveyor_email = frappe.db.get_value("User", doc.surveyor, "email")
+            if not surveyor_email:
+                frappe.msgprint(f"⚠️ No email found for surveyor {doc.surveyor}", alert=True, indicator="orange")
+                return
 
-    event.subject = "Survey Assigned: " + " – ".join(subject_parts or ["Survey"])
+        # ---------------------------------
+        # Find existing event (safely)
+        # ---------------------------------
+        try:
+            event_name = frappe.db.get_value(
+                "Event Link",
+                {
+                    "link_doctype": "Survey",
+                    "link_name": doc.name
+                },
+                "parent"
+            )
+        except Exception as e:
+            # Event Link table might not exist yet
+            event_name = None
 
-    # -------------------------------------------------
-    # DATE LOGIC (NO HOURS)
-    # -------------------------------------------------
-    event.starts_on = doc.survey_start_date
+        is_new = not event_name
 
-    if doc.survey_end_date:
-        # Timed / multi-day event
-        event.ends_on = doc.survey_end_date
-        event.all_day = 0
-    else:
-        # ALL-DAY event (single date)
-        event.ends_on = doc.survey_start_date
-        event.all_day = 1
+        if event_name:
+            try:
+                event = frappe.get_doc("Event", event_name)
+            except Exception:
+                # Event was deleted, create new
+                is_new = True
+                event = frappe.new_doc("Event")
+                event.event_type = "Private"
+        else:
+            event = frappe.new_doc("Event")
+            event.event_type = "Private"
 
-    # -------------------------------------------------
-    # DESCRIPTION (ONLY LEAD)
-    # -------------------------------------------------
-    event.description = f"""
-Survey Title: {doc.title or '—'}
+        # ---------------------------------
+        # Subject
+        # ---------------------------------
+        subject_parts = []
+        if doc.title:
+            subject_parts.append(doc.title)
+        if doc.project_type:
+            subject_parts.append(doc.project_type)
+
+        event.subject = "Survey: " + " – ".join(subject_parts or [doc.name])
+
+        # ---------------------------------
+        # Dates
+        # ---------------------------------
+        event.starts_on = doc.survey_start_date
+        event.ends_on = doc.survey_end_date or doc.survey_start_date
+        event.all_day = 0 if doc.survey_end_date else 1
+
+        # ---------------------------------
+        # Description
+        # ---------------------------------
+        event.description = f"""
+Survey: {doc.name}
+Title: {doc.title or '—'}
 Project Type: {doc.project_type or '—'}
 Lead: {doc.lead or '—'}
+Surveyor: {doc.surveyor}
 Notes: {doc.notes or '—'}
 """.strip()
 
-    # -------------------------------------------------
-    # PARTICIPANT
-    # -------------------------------------------------
-    event.event_participants = []
-    event.append("event_participants", {
-        "reference_doctype": "User",
-        "reference_docname": doc.surveyor
-    })
+        # ---------------------------------
+        # Google Calendar Configuration
+        # ---------------------------------
+        google_calendar = frappe.db.get_value(
+            "Google Calendar",
+            {
+                "enable": 1,
+                "push_to_google_calendar": 1,
+                "name": "Grand renovation"
+            },
+            "name"
+        )
 
-    # -------------------------------------------------
-    # LINK EVENT TO SURVEY
-    # -------------------------------------------------
-    event.links = []
-    event.append("links", {
-        "link_doctype": "Survey",
-        "link_name": doc.name
-    })
+        if google_calendar:
+            event.google_calendar = google_calendar
+            if is_new:
+                event.sync_with_google_calendar = 1
+        else:
+            event.google_calendar = None
+            event.sync_with_google_calendar = 0
 
-    # -------------------------------------------------
-    # GOOGLE CALENDAR
-    # -------------------------------------------------
-    calendar = frappe.db.get_value(
-        "Google Calendar",
-        {
-            "enable": 1,
-            "push_to_google_calendar": 1,
-            "name": "Grand renovation"
-        },
-        "name"
-    )
+        # ---------------------------------
+        # Save Event
+        # ---------------------------------
+        if is_new:
+            # Save event WITHOUT links first
+            event.insert(ignore_permissions=True)
+            
+            # Commit to database
+            frappe.db.commit()
+            
+            # Now add the link in a separate transaction
+            try:
+                link = frappe.new_doc("Event Link")
+                link.parent = event.name
+                link.parenttype = "Event"
+                link.parentfield = "links"
+                link.link_doctype = "Survey"
+                link.link_name = doc.name
+                link.insert(ignore_permissions=True)
+                frappe.db.commit()
+            except Exception as link_error:
+                frappe.log_error(f"Failed to create Event Link: {str(link_error)}", "Event Link Error")
+            
+            frappe.msgprint(
+                f"✅ Calendar Event Created: {event.name}",
+                alert=True,
+                indicator="green"
+            )
 
-    if calendar:
-        event.google_calendar = calendar
-        event.sync_with_google_calendar = 1
-        event.flags.update({"update_google_calendar": True})
+            # Assignment to surveyor
+            try:
+                add_assignment({
+                    "assign_to": [doc.surveyor],
+                    "doctype": "Event",
+                    "name": event.name,
+                    "description": event.subject,
+                    "notify": 1
+                })
+            except Exception as e:
+                frappe.log_error(f"Assignment failed: {str(e)}", "Event Assignment Error")
+            
+            # Schedule background job to update Google Calendar attendees
+            if google_calendar and surveyor_email:
+                frappe.enqueue(
+                    'grand_renovations_app.overrides.survey.update_google_calendar_attendees',
+                    event_name=event.name,
+                    surveyor_email=surveyor_email,
+                    queue='short',
+                    timeout=300,
+                    enqueue_after_commit=True
+                )
+        else:
+            event.save(ignore_permissions=True)
+            frappe.db.commit()
+            
+            frappe.msgprint(
+                f"✅ Calendar Event Updated: {event.name}",
+                alert=True,
+                indicator="blue"
+            )
+            
+            # Update assignment if surveyor changed
+            existing_assignments = frappe.get_all(
+                "ToDo",
+                filters={
+                    "reference_type": "Event",
+                    "reference_name": event.name,
+                    "status": "Open"
+                },
+                pluck="allocated_to"
+            )
+            
+            if doc.surveyor not in existing_assignments:
+                frappe.db.delete("ToDo", {
+                    "reference_type": "Event",
+                    "reference_name": event.name
+                })
+                
+                try:
+                    add_assignment({
+                        "assign_to": [doc.surveyor],
+                        "doctype": "Event",
+                        "name": event.name,
+                        "description": event.subject,
+                        "notify": 1
+                    })
+                except Exception as e:
+                    frappe.log_error(f"Assignment update failed: {str(e)}", "Event Assignment Error")
 
-    # -------------------------------------------------
-    # SAVE EVENT
-    # -------------------------------------------------
-    if is_new:
-        event.insert(ignore_permissions=True)
-    else:
-        event.save(ignore_permissions=True)
+    except Exception as e:
+        error_msg = f"Event creation failed for Survey {doc.name}: {str(e)}\n{frappe.get_traceback()}"
+        frappe.log_error(error_msg, "Calendar Event Error")
+        frappe.msgprint(
+            f"❌ Failed to create calendar event. Check Error Log for details.",
+            alert=True,
+            indicator="red"
+        )
+    
+    finally:
+        # Clear the lock
+        if frappe.flags.get(lock_key):
+            del frappe.flags[lock_key]
 
-    # -------------------------------------------------
-    # ASSIGN SURVEYOR (ONLY ON CREATE)
-    # -------------------------------------------------
-    if is_new:
-        add_assignment({
-            "assign_to": [doc.surveyor],
-            "doctype": "Event",
-            "name": event.name
-        })
+
+@frappe.whitelist()
+def update_google_calendar_attendees(event_name, surveyor_email):
+    """
+    Update Google Calendar event to add surveyor as the only attendee.
+    This ensures only the surveyor receives notifications and sees full details.
+    """
+    try:
+        # Wait for Google Calendar sync to complete
+        import time
+        time.sleep(10)  # Increased wait time
+        
+        # Get event
+        if not frappe.db.exists("Event", event_name):
+            frappe.log_error(f"Event {event_name} not found", "Google Calendar Update")
+            return
+        
+        event = frappe.get_doc("Event", event_name)
+        
+        if not event.google_calendar or not event.google_event_id:
+            # Try reloading one more time
+            time.sleep(5)
+            event.reload()
+            
+            if not event.google_event_id:
+                frappe.log_error(
+                    f"Event {event_name} has no Google Event ID yet. Calendar: {event.google_calendar}",
+                    "Google Calendar Update"
+                )
+                return
+        
+        google_calendar_doc = frappe.get_doc("Google Calendar", event.google_calendar)
+        
+        # Get Google Calendar service
+        from frappe.integrations.doctype.google_calendar.google_calendar import get_google_calendar_object
+        
+        calendar_service = get_google_calendar_object(google_calendar_doc.google_calendar_id)
+        
+        if not calendar_service:
+            frappe.log_error(f"Failed to get calendar service", "Google Calendar Update")
+            return
+        
+        # Get the event from Google Calendar
+        gcal_event = calendar_service.events().get(
+            calendarId=google_calendar_doc.google_calendar_id,
+            eventId=event.google_event_id
+        ).execute()
+        
+        # Update attendees - only the surveyor
+        gcal_event['attendees'] = [
+            {
+                'email': surveyor_email,
+                'responseStatus': 'accepted',
+                'organizer': False
+            }
+        ]
+        
+        # Set visibility to private
+        gcal_event['visibility'] = 'private'
+        
+        # Update the event
+        updated_event = calendar_service.events().update(
+            calendarId=google_calendar_doc.google_calendar_id,
+            eventId=event.google_event_id,
+            body=gcal_event,
+            sendUpdates='all'
+        ).execute()
+        
+        frappe.logger().info(
+            f"✅ Updated Google Calendar event {event.google_event_id} with attendee {surveyor_email}"
+        )
+        
+    except Exception as e:
+        frappe.log_error(
+            f"Error updating Google Calendar attendees: {str(e)}\n{frappe.get_traceback()}",
+            "Google Calendar Update Error"
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -169,7 +169,8 @@ fixtures = [
     "Property Setter",
     "Client Script",
     "Workflow",
-    "Print Format"
+    "Print Format",
+    "DocType"
 ]
 
 
@@ -193,16 +194,27 @@ doc_events = {
         "after_insert": "grand_renovations_app.overrides.stage_automation.set_lead_initial_stage",
     },
     
-    # SURVEY EVENTS
-    "Survey": {
-        "after_insert": [
+    # # SURVEY EVENTS
+    # "Survey": {
+    #     "after_insert": [
+    #         "grand_renovations_app.overrides.survey.create_calendar_event",
+    #         "grand_renovations_app.overrides.stage_automation.update_lead_stage_on_survey",
+    #     ],
+    #     "on_update": [
+    #         "grand_renovations_app.overrides.survey.create_calendar_event"
+    #     ]
+    # },
+
+#    # SURVEY EVENTS - FIXED VERSION
+   "Survey": {
+        "on_change": [
             "grand_renovations_app.overrides.survey.create_calendar_event",
-            "grand_renovations_app.overrides.stage_automation.update_lead_stage_on_survey",
         ],
-        "on_update": [
-            "grand_renovations_app.overrides.survey.create_calendar_event"
+        "after_insert": [
+            "grand_renovations_app.overrides.stage_automation.update_lead_stage_on_survey",
         ]
     },
+
     
     # QUOTATION EVENTS
     "Quotation": {
