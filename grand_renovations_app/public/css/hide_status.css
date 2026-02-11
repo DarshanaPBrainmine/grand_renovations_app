@@ -1,0 +1,50 @@
+/* Hide Status column in Lead List View */
+/* [data-page-route="List/Lead"] .list-row-col[data-field="status"],
+[data-page-route="List/Lead"] [data-fieldname="status"],
+[data-page-route="List/Lead"] div[data-fieldname="status"] {
+    display: none !important;
+    width: 0 !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    visibility: hidden !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+} */
+
+
+
+/* Method 1: Target "Closed Lost" status specifically in Lead doctype */
+.list-row [data-field="stage"] .indicator.red,
+.list-row [data-field="stage"]:has-text("Closed Lost") .indicator {
+    background-color: #ff4444 !important;
+}
+
+/* Method 2: More specific - targets any indicator with "Closed Lost" text */
+.list-row:has([title="Closed Lost"]) .indicator.green {
+    background-color: #dc3545 !important;
+}
+
+/* Method 3: Global - changes all "Closed Lost" indicators across all doctypes */
+[data-label="Closed Lost"] .indicator,
+.indicator:has-text("Closed Lost") {
+    background-color: #ff0000 !important;
+}
+
+/* Method 4: Most reliable - targets the indicator before "Closed Lost" text */
+.list-row-col:has-text("Closed Lost") .indicator.green {
+    background-color: #dc3545 !important;
+}
+
+/* Alternative: Change text color as well */
+.list-row:has([title="Closed Lost"]) [data-label="Closed Lost"] {
+    color: #dc3545 !important;
+}
+
+.list-row:has([title="Closed Lost"]) .indicator.green {
+    background-color: #dc3545 !important;
+}
+.indicator-pill[data-filter="stage,=,Closed Lost"] {
+    background-color: #dc3545 !important;
+}
