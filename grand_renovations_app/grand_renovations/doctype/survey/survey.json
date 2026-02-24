@@ -11,6 +11,7 @@
   "survey_date__time",
   "surveyor",
   "survey_start_date",
+  "custom_notes",
   "column_break_rcyj",
   "opportunity",
   "status",
@@ -238,12 +239,18 @@
    "fieldtype": "Tab Break",
    "label": "Connections",
    "show_dashboard": 1
+  },
+  {
+   "fieldname": "custom_notes",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Notes"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-11 17:16:34.147181",
+ "modified": "2026-02-18 12:24:34.169065",
  "modified_by": "Administrator",
  "module": "Grand Renovations",
  "name": "Survey",

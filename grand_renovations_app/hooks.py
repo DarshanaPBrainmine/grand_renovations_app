@@ -153,7 +153,9 @@ app_license = "mit"
 app_include_js = [
     "/assets/grand_renovations_app/js/google_places.js",
 ]
-
+doctype_js = {
+    "Vendor Pricing": "public/js/vendor_pricing.js"
+}
 app_include_css = [
     "/assets/grand_renovations_app/css/hide_status.css",
 ]
@@ -168,10 +170,11 @@ fixtures = [
     "Custom Field",
     "Property Setter",
     "Client Script",
+    "Server Script",
     "Workflow",
-    "Print Format",
-    "DocType"
+    "Print Format"
 ]
+
 
 
 
@@ -242,4 +245,5 @@ doctype_js = {
     "Lead": "public/js/lead.js",
     "Survey": "public/js/survey.js",
     "Quotation": "public/js/quotation.js",
+    "Vendor Pricing": "public/js/vendor_pricing.js"
 }

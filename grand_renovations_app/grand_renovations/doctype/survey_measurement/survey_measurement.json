@@ -1,0 +1,152 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-14 13:05:43.923273",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "project_type",
+  "item_no",
+  "height",
+  "width",
+  "wall_thickness",
+  "note",
+  "windows_specification_fields_section",
+  "room_location",
+  "window_name",
+  "product_width",
+  "product_height",
+  "glass",
+  "product_name_range",
+  "other_information",
+  "door_specification_fields_section",
+  "door_type",
+  "accessories_per_door_section",
+  "handles",
+  "locks",
+  "vents",
+  "trims"
+ ],
+ "fields": [
+  {
+   "fieldname": "project_type",
+   "fieldtype": "Data",
+   "label": "Project Type"
+  },
+  {
+   "fieldname": "item_no",
+   "fieldtype": "Int",
+   "label": "Item No"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height"
+  },
+  {
+   "fieldname": "width",
+   "fieldtype": "Float",
+   "label": "Width"
+  },
+  {
+   "fieldname": "wall_thickness",
+   "fieldtype": "Float",
+   "label": "wall_thickness"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "label": "Note"
+  },
+  {
+   "fieldname": "windows_specification_fields_section",
+   "fieldtype": "Section Break",
+   "label": "Windows Specification Fields"
+  },
+  {
+   "fieldname": "room_location",
+   "fieldtype": "Data",
+   "label": "Room / Location"
+  },
+  {
+   "fieldname": "window_name",
+   "fieldtype": "Data",
+   "label": "Name (if appropriate)"
+  },
+  {
+   "fieldname": "product_width",
+   "fieldtype": "Float",
+   "label": "Product Width"
+  },
+  {
+   "fieldname": "product_height",
+   "fieldtype": "Float",
+   "label": "Product Height"
+  },
+  {
+   "fieldname": "glass",
+   "fieldtype": "Data",
+   "label": "Glass"
+  },
+  {
+   "fieldname": "product_name_range",
+   "fieldtype": "Data",
+   "label": "Product Name / Range"
+  },
+  {
+   "fieldname": "other_information",
+   "fieldtype": "Small Text",
+   "label": "Other Information"
+  },
+  {
+   "fieldname": "door_specification_fields_section",
+   "fieldtype": "Section Break",
+   "label": "Door Specification Fields"
+  },
+  {
+   "fieldname": "door_type",
+   "fieldtype": "Data",
+   "label": "Type"
+  },
+  {
+   "fieldname": "accessories_per_door_section",
+   "fieldtype": "Section Break",
+   "label": "Accessories (Per Door)"
+  },
+  {
+   "fieldname": "handles",
+   "fieldtype": "Data",
+   "label": "Handles"
+  },
+  {
+   "fieldname": "locks",
+   "fieldtype": "Data",
+   "label": "Locks"
+  },
+  {
+   "fieldname": "vents",
+   "fieldtype": "Data",
+   "label": "Vents"
+  },
+  {
+   "fieldname": "trims",
+   "fieldtype": "Data",
+   "label": "Trims"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-24 12:41:20.463293",
+ "modified_by": "Administrator",
+ "module": "Grand Renovations",
+ "name": "Survey Measurement",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

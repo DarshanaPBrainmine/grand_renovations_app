@@ -1,0 +1,95 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-13 12:15:57.654200",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "survey",
+  "lead",
+  "vendor",
+  "column_break_nnex",
+  "status",
+  "total_vendor_cost",
+  "section_break_lklp",
+  "pricing_ui",
+  "pricing_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "survey",
+   "fieldtype": "Link",
+   "label": "Survey",
+   "options": "Survey"
+  },
+  {
+   "fieldname": "lead",
+   "fieldtype": "Link",
+   "label": "Lead",
+   "options": "Lead"
+  },
+  {
+   "fieldname": "vendor",
+   "fieldtype": "Link",
+   "label": "Vendor",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "column_break_nnex",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nRequested\nReceived\nApproved\nRejected"
+  },
+  {
+   "fieldname": "total_vendor_cost",
+   "fieldtype": "Currency",
+   "label": "Total Vendor Cost"
+  },
+  {
+   "fieldname": "section_break_lklp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "pricing_ui",
+   "fieldtype": "HTML",
+   "label": "Pricing UI"
+  },
+  {
+   "fieldname": "pricing_items",
+   "fieldtype": "Table",
+   "label": "Pricing Items",
+   "options": "Vendor Pricing Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-18 17:29:15.416137",
+ "modified_by": "Administrator",
+ "module": "Grand Renovations",
+ "name": "Vendor Pricing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
