@@ -8,7 +8,7 @@
         return;
     }
 
-    // Expose key globally (optional but useful)
+    
     window.GOOGLE_MAPS_API_KEY = frappe.boot.google_maps_key;
 
     let script = document.createElement("script");

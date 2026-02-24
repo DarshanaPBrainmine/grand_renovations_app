@@ -1,0 +1,21 @@
+[
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 1,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Insert",
+  "enable_rate_limit": 0,
+  "event_frequency": "All",
+  "modified": "2025-12-15 15:24:31.198363",
+  "module": "Grand Renovations",
+  "name": "Calendar Integration",
+  "rate_limit_count": 5,
+  "rate_limit_seconds": 86400,
+  "reference_doctype": "Survey",
+  "script": "import frappe\n\n# Validation\nif not doc.surveyor:\n    frappe.throw(\"Please select a Surveyor\")\n\nif not doc.survey_start_date or not doc.survey_end_date:\n    frappe.throw(\"Survey start and end date are required\")\n\n# Create Event\nevent = frappe.new_doc(\"Event\")\nevent.subject = f\"Survey Assigned: {doc.name}\"\nevent.event_type = \"Private\"\n\nevent.starts_on = doc.survey_start_date\nevent.ends_on = doc.survey_end_date\n\nevent.description = f\"\"\"\nSurvey ID: {doc.name}\nLead: {doc.lead or ''}\nOpportunity: {doc.opportunity or ''}\nNotes: {doc.notes or ''}\n\"\"\"\n\n# Assign event to surveyor\nevent.append(\"event_participants\", {\n    \"reference_doctype\": \"User\",\n    \"reference_docname\": doc.surveyor\n})\n\n# Enable Google Calendar sync\nevent.sync_with_google_calendar = 1\n\n# Link Event back to Survey\nevent.append(\"links\", {\n    \"link_doctype\": \"Survey\",\n    \"link_name\": doc.name\n})\n\n# Save Event\nevent.insert(ignore_permissions=True)\n\n# Assign Event to Surveyor (shows in ERPNext ToDo / notifications)\nfrappe.assign(\"Event\", event.name, doc.surveyor)\n",
+  "script_type": "DocType Event"
+ }
+]

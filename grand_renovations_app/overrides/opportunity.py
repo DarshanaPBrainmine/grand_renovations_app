@@ -149,23 +149,25 @@ def create_survey_from_opportunity(opportunity_name):
 #     return survey.as_dict()
 
 
-def after_insert(doc, method=None):
-    """
-    Opportunity created → Lead = Contacted
-    """
-    if doc.opportunity_from == "Lead" and doc.party_name:
-        frappe.db.set_value(
-            "Lead",
-            doc.party_name,
-            "custom_stage",
-            "Contacted"
-        )
+# def after_insert(doc, method=None):
+#     """
+#     Opportunity created → Lead = Contacted
+#     """
+#     if doc.opportunity_from == "Lead" and doc.party_name:
+#         frappe.db.set_value(
+#             "Lead",
+#             doc.party_name,
+#             "custom_stage",
+#             "Contacted"
+#         )
 
-@frappe.whitelist()
-def mark_as_closed_lost(opportunity):
-    frappe.db.set_value(
-        "Opportunity",
-        opportunity,
-        "custom_stage",
-        "Closed Lost"
-    )
+# @frappe.whitelist()
+# def mark_as_closed_lost(opportunity):
+#     frappe.db.set_value(
+#         "Opportunity",
+#         opportunity,
+#         "custom_stage",
+#         "Closed Lost"
+#     )
+
+

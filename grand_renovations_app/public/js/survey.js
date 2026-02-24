@@ -448,33 +448,3 @@ function fetch_project_fields(frm) {
 
 
 
-frappe.ui.form.on("Survey", {
-    refresh(frm) {
-        frm.trigger("render_attachments");
-    },
-
-    render_attachments(frm) {
-        const wrapper = frm.fields_dict.custom_lead_files_html?.$wrapper;
-        if (!wrapper) return;
-
-        wrapper.html(`
-            <div>
-                <button class="btn btn-xs btn-primary upload-survey-attachment">
-                    + Add Attachment
-                </button>
-                <div style="margin-top:10px;">
-                    <em>No attachments yet</em>
-                </div>
-            </div>
-        `);
-
-        wrapper.find(".upload-survey-attachment")
-            .on("click", () => frm.trigger("upload_attachment"));
-    },
-
-    upload_attachment(frm) {
-        new frappe.ui.FileUploader({
-            allow_multiple: true
-        });
-    }
-});
