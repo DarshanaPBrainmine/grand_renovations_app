@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-03-13 15:03:10.664097",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "vendor_pricing",
+  "supplier",
+  "survey",
+  "agreement_amount",
+  "work_description",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "vendor_pricing",
+   "fieldtype": "Link",
+   "label": "Vendor Pricing",
+   "options": "Vendor Pricing"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "survey",
+   "fieldtype": "Link",
+   "label": "Survey",
+   "options": "Survey"
+  },
+  {
+   "fieldname": "work_description",
+   "fieldtype": "Small Text",
+   "label": "Work Description"
+  },
+  {
+   "fieldname": "agreement_amount",
+   "fieldtype": "Currency",
+   "label": "Agreement Amount"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nSent\nIn Progress\nCompleted"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-03-13 15:16:55.019033",
+ "modified_by": "Administrator",
+ "module": "Grand Renovations",
+ "name": "Subcontract Agreement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
